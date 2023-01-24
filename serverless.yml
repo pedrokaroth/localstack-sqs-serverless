@@ -1,0 +1,33 @@
+service: localstack
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+
+custom:
+  localstack:
+    stages:
+      # list of stages for which the plugin should be enabled
+      - local
+    autostart: true  # optional - Start LocalStack in Docker on Serverless deploy
+    networks: #optional - attaches the list of networks to the localstack docker container after startup
+      - host
+      - overlay
+      - my_custom_network
+    docker:
+      # Enable this flag to run "docker ..." commands as sudo
+      sudo: false
+      
+functions:
+  receive:
+    handler: src/index.receiveMessage
+    events:
+      - sqs:
+          arn: arn:aws:sqs:us-east-1:000000000000:queue
+  send:
+    handler: src/index.sendMessage
+
+plugins:
+  - serverless-localstack
